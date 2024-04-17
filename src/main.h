@@ -252,7 +252,7 @@ namespace block_load
 namespace block_transaction
 {
     const unsigned int DONOT_ACCEPT_BLOCKS_ADMIT_HOURS = 36;
-    const unsigned int DONOT_ACCEPT_BLOCKS_ADMIT_HOURS_TESTNET = 168;
+    const unsigned int DONOT_ACCEPT_BLOCKS_ADMIT_HOURS_TESTNET = 52560;
 
     const unsigned int MAX_ORPHAN_SERIALIZESIZE = 5000;    // send-big-orphans memory exhaustion attack. 10,000 orphans, each of which is at most 5,000 bytes big is at most 500 megabytes of orphans
 

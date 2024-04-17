@@ -409,7 +409,6 @@ bool CTransaction::AreInputsStandard(const MapPrevTx &mapInputs) const
             }
             nArgsExpected += tmpExpected;
         }
-
         if (stack.size() != (unsigned int)nArgsExpected) {
             return false;
         }
@@ -672,7 +671,8 @@ bool CTxMemPool::accept(CTxDB &txdb, CTransaction &tx, bool fCheckInputs, bool *
 
     // Rather not work on nonstandard transactions (unless -testnet)
     std::string strNonStd;
-    if (!args_bool::fTestNet && !tx.IsStandard(strNonStd)) {
+    //if (!args_bool::fTestNet && !tx.IsStandard(strNonStd)) {
+    if (!tx.IsStandard(strNonStd)) {
         return print::error("CTxMemPool::accept() : nonstandard transaction (%s)", strNonStd.c_str());
     }
 
@@ -745,7 +745,8 @@ bool CTxMemPool::accept(CTxDB &txdb, CTransaction &tx, bool fCheckInputs, bool *
         }
 
         // Check for non-standard pay-to-script-hash in inputs
-        if (!tx.AreInputsStandard(mapInputs) && !args_bool::fTestNet) {
+        //if (!tx.AreInputsStandard(mapInputs) && !args_bool::fTestNet) {
+        if (!tx.AreInputsStandard(mapInputs)) {
             return print::error("CTxMemPool::accept() : nonstandard transaction input");
         }
 

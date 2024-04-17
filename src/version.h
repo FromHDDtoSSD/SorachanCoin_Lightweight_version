@@ -24,7 +24,11 @@ namespace version
     // for both bitcoind and bitcoin-qt, to make it harder for attackers to
     // target servers or GUI users specifically.
     //
+#ifdef SCRIPTARGSCHECK_OLD_STRICT
+    const std::string CLIENT_NAME("Satoshi testnet old strict");
+#else
     const std::string CLIENT_NAME("Satoshi");
+#endif
 
     //
     // client versioning
@@ -69,7 +73,7 @@ namespace version
 
 // display version
 #define DISPLAY_VERSION_MAJOR        1
-#define DISPLAY_VERSION_MINOR        60
+#define DISPLAY_VERSION_MINOR        65
 #define DISPLAY_VERSION_REVISION     14
 
 #endif

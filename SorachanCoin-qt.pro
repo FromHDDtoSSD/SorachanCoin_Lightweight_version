@@ -1,6 +1,6 @@
 TEMPLATE = app
 #TARGET = SorachanCoin-qt
-VERSION = 1.60.14
+VERSION = 1.65.14
 
 INCLUDEPATH += src src/json src/qt
 
@@ -20,10 +20,21 @@ DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE __STDC_FORMAT_MAC
 #
 CLI_MODE=0
 
+#
+# testnet old strict
+# 0: QAI mode
+# 1: old version
+#
+TESTNET_OLD_STRICT=0
+
 contains (CLI_MODE, 0) {
     TARGET = SorachanCoin-Core
 } else {
     TARGET = SorachanCoin-cli
+}
+
+contains (TESTNET_OLD_STRICT, 1) {
+    DEFINES += SCRIPTARGSCHECK_OLD_STRICT
 }
 
 contains(CLI_MODE, 0) {

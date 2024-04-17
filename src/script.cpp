@@ -1689,6 +1689,7 @@ bool Script_util::Solver(const CKeyStore &keystore, const CScript &scriptPubKey,
     return false;
 }
 
+#ifdef SCRIPTARGSCHECK_OLD_STRICT
 int Script_util::ScriptSigArgsExpected(TxnOutputType::txnouttype t, const std::vector<std::vector<unsigned char> > &vSolutions)
 {
     using namespace TxnOutputType;
@@ -1708,12 +1709,67 @@ int Script_util::ScriptSigArgsExpected(TxnOutputType::txnouttype t, const std::v
         if (vSolutions.size() < 1 || vSolutions[0].size() < 1) {
             return -1;
         }
-        return vSolutions[0][0] + 1;
+        return (vSolutions[0][0] + 1);
     case TX_SCRIPTHASH:
         return 1; // doesn't include args needed by the script
     }
     return -1;
 }
+
+#else
+
+int Script_util::ScriptSigArgsExpected(TxnOutputType::txnouttype t, const std::vector<std::vector<unsigned char> > &vSolutions)
+{
+    auto IsQaiRand = [](const std::vector<unsigned char> &vch) {
+        if(vch.size() != 33)
+            return false;
+        for(int i=22; i < 33; ++i) {
+            if(vch[i] != 0xFF)
+                return false;
+        }
+        return true;
+    };
+
+    using namespace TxnOutputType;
+
+    switch (t)
+    {
+    case TX_NONSTANDARD:
+        return -1;
+    case TX_NULL_DATA:
+        return 1;
+    case TX_PUBKEY:
+    case TX_PUBKEY_DROP:
+        return 1;
+    case TX_PUBKEYHASH:
+        return 2;
+    case TX_MULTISIG:
+        if (vSolutions.size() < 1 || vSolutions[0].size() < 1) {
+            return -1;
+        }
+
+        {
+            int addstack = 0;
+            for(const auto &vch: vSolutions) {
+                if(IsQaiRand(vch)) {
+                    if(vch[1] == 0x00)
+                        return -1;
+                    else if(vch[1] == 0x01) {
+                        addstack = 3;
+                        break;
+                    } else
+                        return -1;
+                }
+            }
+            return ((vSolutions[0][0] + 1) + addstack);
+        }
+        return -1;
+    case TX_SCRIPTHASH:
+        return 1; // doesn't include args needed by the script
+    }
+    return -1;
+}
+#endif
 
 bool Script_util::IsStandard(const CScript &scriptPubKey, TxnOutputType::txnouttype &whichType)
 {
