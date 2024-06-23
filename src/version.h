@@ -73,7 +73,7 @@ namespace version
 
 // display version
 #define DISPLAY_VERSION_MAJOR        1
-#define DISPLAY_VERSION_MINOR        65
+#define DISPLAY_VERSION_MINOR        66
 #define DISPLAY_VERSION_REVISION     14
 
 #endif
