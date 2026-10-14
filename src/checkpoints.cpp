@@ -47,6 +47,9 @@ const MapCheckpoints Checkpoints::manage::mapCheckpoints =
         ( 627453, uint256("0x27e250658705ddb55129e94f615b36f344f0de1648f1ec286b5562d85befe96a") )  // 1647145568
         ( 681173, uint256("0x9a5616190f4ef00470ca4ca2cf40e893a16fbc16e92993ed23db7003f84e8c8d") )  // 1658537428
         ( 946279, uint256("0x000000000023a0d2a571f156b4ca4c0817f692785b8246b33524d7565448e9d6") )  // 1706666355
+        ( 1028909, uint256("0x00000000013a5ce77d53f98a20bcfd32881395d014a63de9adb4ca0dbb6204bf") ) // 1722407522
+        ( 1308357, uint256("0x00000000002603b2d186c8b6bd9f2c8cb64eb04b21288ae7d9f7b4ea6a029f6c") ) // 1777114390
+        ( 1378569, uint256("0x0000000009c991a4373bfc543b0291daa57ac2c53cd234ef4fcfa62b49a4443b") ) // 1791907885
         ;
 
 const MapCheckpoints Checkpoints::manage::mapCheckpointsTestnet = 
@@ -55,7 +58,7 @@ const MapCheckpoints Checkpoints::manage::mapCheckpointsTestnet =
         ( 5330, uint256("0x000011410a666bec2c474fe25c847ea903279f96d47422ebe4dda1fd44450406") )    // 1533660799
         ;
 
-const LastCheckpointTime Checkpoints::manage::CheckpointLastTime = 1706666355;
+const LastCheckpointTime Checkpoints::manage::CheckpointLastTime = 1791907885;
 const LastCheckpointTime Checkpoints::manage::CheckpointLastTimeTestnet = 1533660799;
 
 //
