@@ -1763,6 +1763,9 @@ int Script_util::ScriptSigArgsExpected(TxnOutputType::txnouttype t, const std::v
                     } else if(vch[1] == 0x03) {
                         addstack = 18;
                         break;
+                    } else if(vch[1] == 0x04) {
+                        addstack = 9;
+                        break;
                     } else
                         return -1;
                 }
