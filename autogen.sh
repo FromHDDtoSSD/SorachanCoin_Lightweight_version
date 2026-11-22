@@ -85,7 +85,7 @@ build_bdb() {
  chmod +w atomic.h
  sed -i -e 's/__atomic_compare_exchange/__db_atomic_compare_exchange/g' atomic.h
  cd ../build_unix/
- if[ ${GCC_OVER_15} = "TRUE" ]; then
+ if [ ${GCC_OVER_15} = "TRUE" ]; then
    CFLAGS="-O2 -std=gnu17 -Wno-implicit-int -Wno-implicit-function-declaration" ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"
  else
    ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"

@@ -23,7 +23,8 @@ https://x.com/DataRescueCoin
 
 How to build?
 ===========================
-./sora_builder.sh<br>
+./sora_builder.sh -j[cpu]<br>
+(e.g. ./sora_builder.sh -j2)<br>
 generated under ./src, "soracoind" "soracoin-cli"
 
 **Automatically and statically links the necessary libraries.<br>
