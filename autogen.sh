@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (c) 2013-2016 The Bitcoin Core developers
-# Copyright (c) 2018-2022 The SorachanCoin Developers
+# Copyright (c) 2018-2026 The SorachanCoin Developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -22,6 +22,7 @@ usage() {
  echo "Usage: SorachanCoin ${PROGNAME}"
  echo "Options:"
  echo "-h, --help: View usage"
+ echo "-j=[cpu]: make -j[cpu]"
 ## echo "--prefix: --prefix=[install path] (e.g. --prefix=/opt/SorachanCoin)"
  echo "--build-unix: Build a UNIX system (e.g. FreeBSD)."
  echo "--with-no-build-library: Use the package without building the necessary libraries."
@@ -30,6 +31,7 @@ usage() {
 PREFIX=""
 WITH_NO_BUILD_LIBRARY="FALSE"
 BUILD_UNIX="FALSE"
+JOBS="1"
 for OPT in "$@"
 do
  case "$OPT" in
@@ -40,10 +42,18 @@ do
   PREFIX="$OPT";;
   '--with-no-build-library')
   WITH_NO_BUILD_LIBRARY="TRUE";;
+  --j*)
+  JOBS="${OPT#--j=}";;
   '--build-unix')
   BUILD_UNIX="TRUE";;
  esac
 done
+
+case "$JOBS" in
+  ''|*[!0-9]*|0)
+    JOBS="1"
+    ;;
+esac
 
 WORK_DIR="work"
 LIBRARY_DIR="library"
@@ -68,8 +78,8 @@ build_bdb() {
  chmod +w atomic.h
  sed -i -e 's/__atomic_compare_exchange/__db_atomic_compare_exchange/g' atomic.h
  cd ../build_unix/
- ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"
- ${CMD_MAKE}
+ CFLAGS="-O2 -std=gnu17 -Wno-implicit-int -Wno-implicit-function-declaration" ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"
+ ${CMD_MAKE} -j"$JOBS"
  ${CMD_MAKE} install
 }
 
@@ -82,7 +92,7 @@ build_boost() {
  tar zxvf boost_1_68_0.tar.gz
  cd boost_1_68_0
  ./bootstrap.sh --with-toolset=gcc
- ./b2 install -j2 --toolset=gcc --variant=release --link=static --threading=multi --with-system --with-filesystem --with-program_options --with-thread --with-chrono --prefix="$srcdir"/"$LIBRARY_DIR"/"$boost_dir"
+ ./b2 install -j"$JOBS" --toolset=gcc --variant=release --link=static --threading=multi --with-system --with-filesystem --with-program_options --with-thread --with-chrono --prefix="$srcdir"/"$LIBRARY_DIR"/"$boost_dir"
 }
 
 build_libressl() {
@@ -94,7 +104,7 @@ build_libressl() {
  tar zxvf libressl-2.8.2.tar.gz
  cd libressl-2.8.2
  ./config --prefix="$srcdir"/"$LIBRARY_DIR"/"$libressl_dir" shared
- ${CMD_MAKE}
+ ${CMD_MAKE} -j"$JOBS"
  ${CMD_MAKE} install
 }
 
@@ -109,7 +119,7 @@ build_libressl() {
 # cd libb2-master
 # ./autogen.sh
 # ./configure --prefix="$srcdir"/"$LIBRARY_DIR"/"$blake2_dir"
-# ${CMD_MAKE}
+# ${CMD_MAKE} -j"$JOBS"
 # ${CMD_MAKE} install
 #}
 
@@ -123,7 +133,7 @@ build_sqlite() {
  unlink sqlite-autoconf-3350300.tar.gz
  cd sqlite-autoconf-3350300
  ./configure --prefix="$srcdir"/"$LIBRARY_DIR"/"$sqlite_dir"
- ${CMD_MAKE}
+ ${CMD_MAKE} -j"$JOBS"
  ${CMD_MAKE} install
  cd "$srcdir"/"$LIBRARY_DIR"/"$sqlite_dir"/include
  mkdir sqlite
@@ -162,8 +172,8 @@ autoreconf --install
 chmod 700 configure
 ## ./configure ${PREFIX}
 if [ ${BUILD_UNIX} = "FALSE" ]; then
- ${CMD_MAKE} -C src/leveldb
- ${CMD_MAKE} -C src/leveldb memenv_test
+ ${CMD_MAKE} -j"$JOBS" -C src/leveldb
+ ${CMD_MAKE} -j"$JOBS" -C src/leveldb memenv_test
 else
  cd ./src/leveldb
  chmod +x ./build_detect_platform
