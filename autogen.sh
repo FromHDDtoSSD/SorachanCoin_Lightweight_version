@@ -22,7 +22,7 @@ usage() {
  echo "Usage: SorachanCoin ${PROGNAME}"
  echo "Options:"
  echo "-h, --help: View usage"
- echo "-j=[cpu]: make -j[cpu]"
+ echo "-j[cpu]: make -j[cpu]"
 ## echo "--prefix: --prefix=[install path] (e.g. --prefix=/opt/SorachanCoin)"
  echo "--build-unix: Build a UNIX system (e.g. FreeBSD)."
  echo "--with-no-build-library: Use the package without building the necessary libraries."
@@ -42,8 +42,8 @@ do
   PREFIX="$OPT";;
   '--with-no-build-library')
   WITH_NO_BUILD_LIBRARY="TRUE";;
-  --j*)
-  JOBS="${OPT#--j=}";;
+  -j*)
+  JOBS="${OPT#-j}";;
   '--build-unix')
   BUILD_UNIX="TRUE";;
  esac
@@ -54,6 +54,13 @@ case "$JOBS" in
     JOBS="1"
     ;;
 esac
+
+GCC_OVER_15="FALSE"
+GCC_VER_RAW="$(gcc -dumpfullversion 2>/dev/null || gcc -dumpversion 2>/dev/null || echo "0")"
+GCC_MAJOR="${GCC_VER_RAW%%.*}"
+if [ -n "$GCC_MAJOR" ] && [ "$GCC_MAJOR" -ge 15 ] 2>/dev/null; then
+  GCC_OVER_15="TRUE"
+fi
 
 WORK_DIR="work"
 LIBRARY_DIR="library"
@@ -78,7 +85,11 @@ build_bdb() {
  chmod +w atomic.h
  sed -i -e 's/__atomic_compare_exchange/__db_atomic_compare_exchange/g' atomic.h
  cd ../build_unix/
- CFLAGS="-O2 -std=gnu17 -Wno-implicit-int -Wno-implicit-function-declaration" ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"
+ if[ ${GCC_OVER_15} = "TRUE" ]; then
+   CFLAGS="-O2 -std=gnu17 -Wno-implicit-int -Wno-implicit-function-declaration" ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"
+ else
+   ../dist/configure --enable-cxx --disable-shared --with-pic --prefix="$srcdir"/"$LIBRARY_DIR"/"$bdb_dir"
+ fi
  ${CMD_MAKE} -j"$JOBS"
  ${CMD_MAKE} install
 }
